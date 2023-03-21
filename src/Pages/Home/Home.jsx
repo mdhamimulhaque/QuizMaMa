@@ -1,11 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const Home = () => {
+    const [categories, setCategories] = useState();
     const { register, handleSubmit } = useForm();
     const onSubmit = data => {
         console.log(data)
+
     };
+
+    useEffect(() => {
+        fetch(`https://opentdb.com/api_category.php`)
+            .then(res => res.json())
+            .then(data => setCategories(data?.trivia_categories))
+    }, [categories])
+
+
+    const levels = [
+        {
+            id: 1,
+            name: "easy",
+        },
+        {
+            id: 2,
+            name: "medium",
+        },
+        {
+            id: 3,
+            name: "hard",
+        },
+    ]
 
     return (
         <div className='min-h-screen bg-indigo-100 w-full flex justify-center items-center'>
@@ -37,10 +61,14 @@ const Home = () => {
                             required
                             {...register("category")}
                         >
-                            <option value="t">Test</option>
-                            <option value="">Test</option>
-                            <option value="">Test</option>
-                            <option value="">Test</option>
+                            {
+                                categories?.map(category =>
+                                    <option key={category?.id}
+                                        value={category?.id}>
+                                        {category?.name}
+                                    </option>)
+                            }
+
                         </select>
                     </div>
                     <div className="input_group my-3">
@@ -51,10 +79,13 @@ const Home = () => {
                             required
                             {...register("level")}
                         >
-                            <option value="tt">Test</option>
-                            <option value="">Test</option>
-                            <option value="">Test</option>
-                            <option value="">Test</option>
+                            {
+                                levels?.map(level =>
+                                    <option key={level?.id}
+                                        value={level?.id}>
+                                        {level?.name}
+                                    </option>)
+                            }
                         </select>
                     </div>
 
