@@ -2,18 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const Home = () => {
-    const [categories, setCategories] = useState();
+    const [categories, setCategories] = useState([]);
+    const [quizzes, setQuizzes] = useState([]);
+    const [formData, setFormData] = useState({});
     const { register, handleSubmit } = useForm();
-    const onSubmit = data => {
-        console.log(data)
+    console.log(formData)
 
+    const onSubmit = data => {
+        setFormData(data)
     };
 
+    const getCategoryData = async () => {
+        const url = "https://opentdb.com/api_category.php"
+        const response = await fetch(url);
+        const data = await response.json();
+        setCategories(data.trivia_categories);
+    }
+    const getQuizzesData = async (formData) => {
+        const url = `https://opentdb.com/api.php?amount=10&category=${formData?.category}&difficulty=${formData?.level}&type=multiple`;
+        const response = await fetch(url);
+        const data = await response.json();
+        setQuizzes(data);
+    }
+
+
     useEffect(() => {
-        fetch(`https://opentdb.com/api_category.php`)
-            .then(res => res.json())
-            .then(data => setCategories(data?.trivia_categories))
-    }, [categories])
+        getCategoryData();
+        getQuizzesData(formData);
+    }, [])
 
 
     const levels = [
@@ -30,7 +46,7 @@ const Home = () => {
             name: "hard",
         },
     ]
-
+    console.log(quizzes)
     return (
         <div className='min-h-screen bg-indigo-100 w-full flex justify-center items-center'>
             <div className="bg-indigo-200 sm:max-w-md sm:w-full sm:mx-auto sm:rounded-lg sm:overflow-hidden shadow-lg py-5">
@@ -61,6 +77,7 @@ const Home = () => {
                             required
                             {...register("category")}
                         >
+                            <option value="">-Select your Category-</option>
                             {
                                 categories?.map(category =>
                                     <option key={category?.id}
@@ -82,7 +99,7 @@ const Home = () => {
                             {
                                 levels?.map(level =>
                                     <option key={level?.id}
-                                        value={level?.id}>
+                                        value={level?.name}>
                                         {level?.name}
                                     </option>)
                             }
@@ -91,7 +108,7 @@ const Home = () => {
 
 
                     <button type="submit" className="w-full cmn_btn bg-indigo-700 hover:bg-indigo-800">
-                        Start
+                        Get Started
                     </button>
                 </form>
             </div>
