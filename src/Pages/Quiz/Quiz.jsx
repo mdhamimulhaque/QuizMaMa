@@ -1,33 +1,55 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Question from '../../components/Question/Question';
 
 const Quiz = () => {
     const location = useLocation();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
+    const [totalCorrect, setTotalCorrect] = useState(0);
+    const [optionDisable, setOptionDisable] = useState(false);
     const { username, quizzes } = location.state;
 
-    const handleAnswer = (selectedOption) => {
-        const answer = quizzes[currentIndex]?.correct_answer;
+    const navigate = useNavigate();
+
+    const handleResult = () => {
+        // navigate('/results', { replace: true, state: { username: username, totalCorrect: totalCorrect } });
+        navigate('/results');
+        const resultData = {
+            username,
+            totalCorrect
+        }
+        localStorage.setItem("resultData", JSON.stringify(resultData));
     }
 
+    const handleAnswer = (selectedOption) => {
+        const correctAnswer = quizzes[currentIndex]?.correct_answer;
+        if (selectedOption) {
+            setOptionDisable(true)
+        }
+        if (selectedOption === correctAnswer) {
+            setTotalCorrect(totalCorrect + 1);
+        }
+
+    }
+    // handle next
     const handleNextQuestion = () => {
-        console.log(currentIndex, quizzes.length)
         if (currentIndex >= quizzes.length - 2) {
             setIsFinished(true)
         }
         setCurrentIndex(currentIndex + 1);
+        setOptionDisable(false)
     }
+    // handle prev
     const handlePrevQuestion = () => {
         if (currentIndex <= 0) {
             return;
         }
         setCurrentIndex(currentIndex - 1);
+        setOptionDisable(false)
     }
+    // handle skip
     const handleSkipQuestion = () => {
-
-        console.log(currentIndex, quizzes.length)
         if (currentIndex < 0) {
             return;
         }
@@ -35,6 +57,7 @@ const Quiz = () => {
             return;
         }
         setCurrentIndex(currentIndex + 1);
+        setOptionDisable(false)
     }
     return (
         <div className='p-4'>
@@ -44,7 +67,11 @@ const Quiz = () => {
                 <span>{quizzes.length}/{currentIndex + 1}</span>
             </section>
             {
-                isFinished ? "done" : <Question quizzes={quizzes[currentIndex]} handleAnswer={handleAnswer} />
+                isFinished ? <h1 className='text-xl font-semibold text-center'>No More Questions.Lets Finished it.</h1> :
+                    <Question
+                        quizzes={quizzes[currentIndex]}
+                        optionDisable={optionDisable}
+                        handleAnswer={handleAnswer} />
             }
 
             <section>
@@ -67,14 +94,19 @@ const Quiz = () => {
                 }
 
                 {
-                    isFinished ? <button
-                        className='w-full cmn_btn bg-indigo-700 hover:bg-indigo-800'>
-                        Finished
-                    </button> : <button
-                        onClick={handleSkipQuestion}
-                        className='w-full cmn_btn bg-indigo-700 hover:bg-indigo-800'>
-                        Skip
-                    </button>
+                    isFinished ?
+                        <button
+                            onClick={handleResult}
+                            className='w-full cmn_btn bg-indigo-700 hover:bg-indigo-800'>
+                            Finished
+                        </button>
+
+                        :
+                        <button
+                            onClick={handleSkipQuestion}
+                            className='w-full cmn_btn bg-indigo-700 hover:bg-indigo-800'>
+                            Skip
+                        </button>
                 }
 
             </section>

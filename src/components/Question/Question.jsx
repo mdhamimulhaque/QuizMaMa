@@ -1,13 +1,9 @@
 import React from 'react';
 
 const Question = ({ quizzes: { question, incorrect_answers, correct_answer
-}, handleAnswer }) => {
+}, handleAnswer, optionDisable }) => {
     const allOptions = [correct_answer, ...incorrect_answers];
     var randomOptions = allOptions.sort(() => Math.random() - 0.5);
-
-    // console.log(randomItem)
-
-
 
     return (
         <div>
@@ -15,28 +11,13 @@ const Question = ({ quizzes: { question, incorrect_answers, correct_answer
             <section>
                 {
                     randomOptions.map((option, index) => <button key={index}
-                        className="w-full cmn_btn text-gray-800 bg-white mt-0 mb-4"
+                        className={`w-full cmn_btn text-gray-800  mt-0 mb-4 ${optionDisable ? 'bg-gray-200' : 'bg-white'}`}
                         onClick={() => handleAnswer(option)}
+                        disabled={optionDisable}
                     >
                         {option}
                     </button>)
                 }
-                {/* <button
-                    className="w-full cmn_btn text-gray-800 bg-white mt-0 mb-4">
-                    1
-                </button>
-                <button
-                    className="w-full cmn_btn text-gray-800 bg-white mt-0 mb-4">
-                    1
-                </button>
-                <button
-                    className="w-full cmn_btn text-gray-800 bg-white mt-0 mb-4">
-                    1
-                </button>
-                <button
-                    className="w-full cmn_btn text-gray-800 bg-white mt-0 mb-4">
-                    1
-                </button> */}
             </section>
         </div>
     );

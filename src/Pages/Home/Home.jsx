@@ -13,7 +13,7 @@ const Home = () => {
     const navigate = useNavigate();
 
     if (quizzes && quizzes.length > 0) {
-        navigate('/quiz', { state: { username: formData.name, quizzes: quizzes } });
+        navigate('/quiz', { replace: true, state: { username: formData.name, quizzes: quizzes } });
     }
 
     const onSubmit = data => {
